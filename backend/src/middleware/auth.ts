@@ -19,3 +19,20 @@ export function requireAuth(
     next(err);
   }
 }
+
+export function requireRole(role: 'client' | 'professional') {
+  return (req: Request, _res: Response, next: NextFunction): void => {
+    if (!req.user || req.user.role !== role) {
+      next(
+        new AppError(
+          403,
+          'FORBIDDEN',
+          'Acesso reservado a contas de ' +
+            (role === 'client' ? 'cliente' : 'profissional'),
+        ),
+      );
+      return;
+    }
+    next();
+  };
+}

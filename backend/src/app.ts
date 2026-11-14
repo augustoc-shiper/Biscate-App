@@ -8,6 +8,7 @@ import {
   metaRoutes,
   professionalRoutes,
 } from './routes/professionals.routes.js';
+import { offerRoutes, requestRoutes } from './routes/requests.routes.js';
 
 export function createApp(): Express {
   const app = express();
@@ -22,6 +23,8 @@ export function createApp(): Express {
   app.use('/api/auth', authRoutes);
   app.use('/api/professionals', professionalRoutes);
   app.use('/api/favorites', favoriteRoutes);
+  app.use('/api/requests', requestRoutes);
+  app.use('/api/offers', offerRoutes);
   app.use('/api', metaRoutes);
 
   app.use(notFoundHandler);
