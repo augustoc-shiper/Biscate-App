@@ -9,7 +9,11 @@ import {
   metaRoutes,
   professionalRoutes,
 } from './routes/professionals.routes.js';
-import { offerRoutes, requestRoutes } from './routes/requests.routes.js';
+import {
+  offerRoutes,
+  requestRoutes,
+} from './routes/requests.routes.js';
+import { paymentRoutes, planRoutes } from './routes/payments.routes.js';
 import { reviewRoutes } from './routes/reviews.routes.js';
 
 export function createApp(): Express {
@@ -29,6 +33,8 @@ export function createApp(): Express {
   app.use('/api/offers', offerRoutes);
   app.use('/api/conversations', conversationRoutes);
   app.use('/api/reviews', reviewRoutes);
+  app.use('/api/plans', planRoutes);
+  app.use('/api/payments', paymentRoutes);
   app.use('/api', metaRoutes);
 
   app.use(notFoundHandler);
