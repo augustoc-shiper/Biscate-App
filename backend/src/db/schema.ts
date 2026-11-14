@@ -218,7 +218,7 @@ export const plans = pgTable('plans', {
   id: integer('id').primaryKey().generatedByDefaultAsIdentity(),
   days: integer('days').notNull(),
   priceKz: integer('price_kz').notNull(),
-  name: text('name').notNull(),
+  name: text('name').notNull().unique(),
   highlight: boolean('highlight').notNull().default(false),
 });
 
