@@ -9,7 +9,7 @@ import type { SendMessageInput } from '../dto/conversations.dto.js';
 import { AppError } from '../lib/AppError.js';
 import { ensureConversation } from './conversations.helpers.js';
 
-async function assertParticipant(
+export async function assertParticipant(
   conversationId: string,
   userId: string,
 ): Promise<(typeof conversations.$inferSelect)> {
