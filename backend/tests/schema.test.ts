@@ -51,8 +51,9 @@ it('cria as 14 tabelas do spec', async () => {
 it('usa gen_random_uuid como default do id de users', async () => {
   const res = await pool.query(
     `insert into users (name, email, password_hash)
-     values ('Schema Test', 'schema@test.local', 'x')
+     values ('Schema Test', $1, 'x')
      returning id`,
+    [`schema-${crypto.randomUUID()}@test.local`],
   );
   expect(String(res.rows[0].id)).toMatch(
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
