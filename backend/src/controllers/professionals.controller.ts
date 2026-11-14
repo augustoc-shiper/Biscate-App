@@ -23,7 +23,9 @@ export async function detail(
   next: NextFunction,
 ): Promise<void> {
   try {
-    const result = await professionalsService.getProfessional(req.params.id);
+    const result = await professionalsService.getProfessional(
+      String(req.params.id),
+    );
     ok(res, result);
   } catch (err) {
     next(err);
