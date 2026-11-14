@@ -10,6 +10,7 @@ import {
   professionalRoutes,
 } from './routes/professionals.routes.js';
 import { offerRoutes, requestRoutes } from './routes/requests.routes.js';
+import { reviewRoutes } from './routes/reviews.routes.js';
 
 export function createApp(): Express {
   const app = express();
@@ -27,6 +28,7 @@ export function createApp(): Express {
   app.use('/api/requests', requestRoutes);
   app.use('/api/offers', offerRoutes);
   app.use('/api/conversations', conversationRoutes);
+  app.use('/api/reviews', reviewRoutes);
   app.use('/api', metaRoutes);
 
   app.use(notFoundHandler);
