@@ -213,25 +213,36 @@ export async function seed(database = db): Promise<void> {
     ])
     .onConflictDoNothing({ target: users.email });
 
-  await database
-    .insert(professionalProfiles)
-    .values(
-      PROS.map((p) => ({
-        userId: p.id,
-        categoryId: p.categoryId,
-        bairroId: p.bairroId,
-        priceText: p.priceText,
-        priceMin: p.priceMin,
-        responseTime: '1 h',
-        availableToday: p.availableToday,
-        planExpiresAt: new Date(Date.now() + p.planDays * day),
-        ratingAvg: p.ratingAvg,
-        ratingCount: p.ratingCount,
-        visitsCount: p.visitsCount,
-        distanceKm: p.distanceKm,
-      })),
-    )
-    .onConflictDoNothing({ target: professionalProfiles.userId });
+  for (const p of PROS) {
+    const values = {
+      userId: p.id,
+      categoryId: p.categoryId,
+      bairroId: p.bairroId,
+      priceText: p.priceText,
+      priceMin: p.priceMin,
+      responseTime: '1 h',
+      availableToday: p.availableToday,
+      planExpiresAt: new Date(Date.now() + p.planDays * day),
+      ratingAvg: p.ratingAvg,
+      ratingCount: p.ratingCount,
+      visitsCount: p.visitsCount,
+      distanceKm: p.distanceKm,
+    };
+    await database
+      .insert(professionalProfiles)
+      .values(values)
+      .onConflictDoUpdate({
+        target: professionalProfiles.userId,
+        set: {
+          availableToday: values.availableToday,
+          planExpiresAt: values.planExpiresAt,
+          ratingAvg: values.ratingAvg,
+          ratingCount: values.ratingCount,
+          visitsCount: values.visitsCount,
+          distanceKm: values.distanceKm,
+        },
+      });
+  }
 
   await database
     .insert(favorites)

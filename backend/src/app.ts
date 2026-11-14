@@ -3,6 +3,10 @@ import cors from 'cors';
 import { config } from './config.js';
 import { errorHandler, notFoundHandler } from './middleware/error.js';
 import { authRoutes } from './routes/auth.routes.js';
+import {
+  metaRoutes,
+  professionalRoutes,
+} from './routes/professionals.routes.js';
 
 export function createApp(): Express {
   const app = express();
@@ -15,6 +19,8 @@ export function createApp(): Express {
   });
 
   app.use('/api/auth', authRoutes);
+  app.use('/api/professionals', professionalRoutes);
+  app.use('/api', metaRoutes);
 
   app.use(notFoundHandler);
   app.use(errorHandler);
