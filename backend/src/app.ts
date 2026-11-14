@@ -3,6 +3,7 @@ import cors from 'cors';
 import { config } from './config.js';
 import { errorHandler, notFoundHandler } from './middleware/error.js';
 import { authRoutes } from './routes/auth.routes.js';
+import { conversationRoutes } from './routes/conversations.routes.js';
 import { favoriteRoutes } from './routes/favorites.routes.js';
 import {
   metaRoutes,
@@ -25,6 +26,7 @@ export function createApp(): Express {
   app.use('/api/favorites', favoriteRoutes);
   app.use('/api/requests', requestRoutes);
   app.use('/api/offers', offerRoutes);
+  app.use('/api/conversations', conversationRoutes);
   app.use('/api', metaRoutes);
 
   app.use(notFoundHandler);
