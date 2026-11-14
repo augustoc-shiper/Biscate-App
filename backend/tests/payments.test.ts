@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { beforeAll, expect, it } from 'vitest';
+import { afterAll, beforeAll, expect, it } from 'vitest';
 import { createApp } from '../src/app.js';
 import { pool } from '../src/db/client.js';
 import { seed } from '../src/db/seed.js';
@@ -9,6 +9,7 @@ const app = createApp();
 let proAToken = '';
 let proAId = '';
 let proBToken = '';
+let proBId = '';
 let clientToken = '';
 let paymentId = '';
 const ts = Date.now();
@@ -32,6 +33,7 @@ beforeAll(async () => {
     role: 'professional',
   });
   proBToken = proB.body.data.token;
+  proBId = proB.body.data.user.id;
 
   const client = await request(app).post('/api/auth/register').send({
     name: 'Cliente Pagamentos',
@@ -40,6 +42,18 @@ beforeAll(async () => {
     role: 'client',
   });
   clientToken = client.body.data.token;
+});
+
+afterAll(async () => {
+  // não contaminar professionals.test (contagem de planos activos)
+  await pool.query(
+    'delete from payments where professional_id = $1 or professional_id = $2',
+    [proAId, proBId],
+  );
+  await pool.query(
+    'update professional_profiles set plan_expires_at = null where user_id = $1',
+    [proAId],
+  );
 });
 
 it('GET /api/plans público devolve 4 planos', async () => {
