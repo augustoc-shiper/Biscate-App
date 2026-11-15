@@ -1,0 +1,71 @@
+.bubble-row {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.bubble-row.mine {
+  justify-content: flex-end;
+}
+
+.bubble {
+  max-width: 78%;
+  background: #fff;
+  border: 1px solid var(--ln);
+  border-radius: 16px 16px 16px 4px;
+  padding: 9px 12px 6px;
+}
+
+.bubble.mine {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+  border-radius: 16px 16px 4px 16px;
+}
+
+.bubble p {
+  margin: 0;
+  font-size: 15px;
+}
+
+.bubble time {
+  display: block;
+  text-align: right;
+  font-size: 10px;
+  opacity: 0.65;
+  margin-top: 3px;
+}
+
+.bubble-sender {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--red);
+  margin-bottom: 2px;
+}
+
+.bubble-rating {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.quote-card {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 160px;
+  border-left: 3px solid var(--gold);
+  padding-left: 8px;
+}
+
+.quote-card strong {
+  font-size: 13px;
+}
+
+.quote-card p {
+  font-size: 14px;
+}
+
+.quote-card b {
+  color: var(--gold);
+}

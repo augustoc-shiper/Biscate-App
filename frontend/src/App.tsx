@@ -7,6 +7,8 @@ import Splash from './components/Splash';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Home from './pages/app/Home';
+import ChatList from './pages/app/ChatList';
+import ChatRoom from './pages/app/ChatRoom';
 import Placeholder from './pages/app/Placeholder';
 import Profile from './pages/app/Profile';
 import Search from './pages/app/Search';
@@ -27,11 +29,8 @@ export default function App() {
             <Route index element={<Home />} />
             <Route path="search" element={<Search />} />
             <Route path="professional/:id" element={<Profile />} />
-            <Route path="chat" element={<Placeholder title="Mensagens" />} />
-            <Route
-              path="chat/:id"
-              element={<Placeholder title="Conversa" />}
-            />
+            <Route path="chat" element={<ChatList />} />
+            <Route path="chat/:id" element={<ChatRoom />} />
             <Route
               path="requests"
               element={<Placeholder title="Pedidos" />}
