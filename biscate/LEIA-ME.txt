@@ -1,0 +1,14 @@
+BISCATE - protótipo (app + site)
+
+Estrutura:
+  index.html        -> o site (página de apresentação)
+  app/index.html    -> a app (protótipo clicável)
+
+Como abrir:
+  Faça duplo clique em index.html. O site abre no navegador e o botão "Experimentar a app" abre a app.
+  Precisa de internet apenas para carregar o tipo de letra (Inter). Sem internet, usa o tipo de letra do sistema.
+
+Como pôr online (grátis): veja o guia "Biscate: guia do código".
+  Resumo: arraste a pasta "biscate" inteira para https://app.netlify.com/drop
+
+Atenção: login, chat, pagamentos e dados são SIMULADOS. O guia explica como os tornar reais.
