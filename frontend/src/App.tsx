@@ -1,33 +1,50 @@
+import { AnimatePresence } from 'motion/react';
+import { useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
+import AppShell from './components/AppShell';
 import ProtectedRoute from './components/ProtectedRoute';
-import ChatList from './pages/ChatList';
-import ChatRoom from './pages/ChatRoom';
-import Dashboard from './pages/Dashboard';
-import Home from './pages/Home';
+import Splash from './components/Splash';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
-import Me from './pages/Me';
-import Plans from './pages/Plans';
-import Professional from './pages/Professional';
-import Requests from './pages/Requests';
-import Search from './pages/Search';
+import Placeholder from './pages/app/Placeholder';
 
 export default function App() {
+  const [showSplash, setShowSplash] = useState(true);
+
   return (
-    <Routes>
-      <Route path="/" element={<Landing />} />
-      <Route path="/login" element={<Login />} />
-      <Route element={<ProtectedRoute />}>
-        <Route path="/app" element={<Home />} />
-        <Route path="/app/search" element={<Search />} />
-        <Route path="/app/professional/:id" element={<Professional />} />
-        <Route path="/app/chat" element={<ChatList />} />
-        <Route path="/app/chat/:id" element={<ChatRoom />} />
-        <Route path="/app/requests" element={<Requests />} />
-        <Route path="/app/plans" element={<Plans />} />
-        <Route path="/app/dashboard" element={<Dashboard />} />
-        <Route path="/app/me" element={<Me />} />
-      </Route>
-    </Routes>
+    <>
+      <AnimatePresence>
+        {showSplash && <Splash onDone={() => setShowSplash(false)} />}
+      </AnimatePresence>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<Login />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/app" element={<AppShell />}>
+            <Route index element={<Placeholder title="Início" />} />
+            <Route path="search" element={<Placeholder title="Pesquisa" />} />
+            <Route
+              path="professional/:id"
+              element={<Placeholder title="Perfil do profissional" />}
+            />
+            <Route path="chat" element={<Placeholder title="Mensagens" />} />
+            <Route
+              path="chat/:id"
+              element={<Placeholder title="Conversa" />}
+            />
+            <Route
+              path="requests"
+              element={<Placeholder title="Pedidos" />}
+            />
+            <Route path="plans" element={<Placeholder title="Planos" />} />
+            <Route
+              path="dashboard"
+              element={<Placeholder title="Painel" />}
+            />
+            <Route path="me" element={<Placeholder title="Perfil" />} />
+          </Route>
+        </Route>
+      </Routes>
+    </>
   );
 }

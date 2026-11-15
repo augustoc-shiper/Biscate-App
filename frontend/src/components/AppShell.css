@@ -1,0 +1,57 @@
+.app-shell {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  background: var(--fl);
+}
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: var(--red);
+  color: #fff;
+}
+
+.app-logo {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #fff;
+  text-decoration: none;
+}
+
+.app-logo span {
+  color: var(--gold);
+}
+
+.app-bell {
+  color: #fff;
+  display: inline-flex;
+  padding: 6px;
+  border-radius: 8px;
+}
+
+.app-bell:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.app-main {
+  flex: 1;
+  padding: 16px 16px 88px;
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.page-placeholder h2 {
+  margin: 8px 0;
+}
+
+.page-placeholder p {
+  color: var(--mu);
+}
