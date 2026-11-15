@@ -19,6 +19,7 @@ import {
   dashboardRoutes,
   profileRoutes,
 } from './routes/profile.routes.js';
+import { notificationRoutes } from './routes/notifications.routes.js';
 import { reviewRoutes } from './routes/reviews.routes.js';
 
 export function createApp(): Express {
@@ -43,6 +44,7 @@ export function createApp(): Express {
   app.use('/api/payments', paymentRoutes);
   app.use('/api/dashboard', dashboardRoutes);
   app.use('/api/profile', profileRoutes);
+  app.use('/api/notifications', notificationRoutes);
   app.use('/api', metaRoutes);
 
   app.use(notFoundHandler);

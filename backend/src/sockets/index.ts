@@ -1,7 +1,6 @@
 import type { Server as HttpServer } from 'node:http';
 import { Server } from 'socket.io';
 import { db } from '../db/client.js';
-import { notifications } from '../db/schema.js';
 import { SendMessageDto } from '../dto/conversations.dto.js';
 import { AppError } from '../lib/AppError.js';
 import { verifyToken, type JwtPayload } from '../lib/jwt.js';
@@ -9,6 +8,7 @@ import {
   assertParticipant,
   sendMessage,
 } from '../services/conversations.service.js';
+import { notify } from '../services/notifications.service.js';
 
 export type SocketData = { user: JwtPayload };
 
@@ -133,11 +133,12 @@ export function createSocketServer(
           (s) => s.data.user?.id === peerId,
         );
         if (!peerOnline) {
-          await db.insert(notifications).values({
-            userId: peerId,
-            kind: 'message',
-            body: (message.body ?? '').slice(0, 200),
-          });
+          await notify(
+            db,
+            peerId,
+            'message',
+            (message.body ?? '').slice(0, 200),
+          );
         }
       } catch (err) {
         if (typeof ack === 'function') ack(toAckPayload(err));
