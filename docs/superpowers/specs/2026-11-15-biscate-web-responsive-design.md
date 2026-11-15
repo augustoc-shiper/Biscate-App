@@ -1,7 +1,7 @@
 # Biscate — Redesign Web-First Responsivo
 
 **Data:** 2026-11-15
-**Estado:** aprovado em brainstorming (secções 1-3), aguarda revisão
+**Estado:** aprovado (secções 1-3) — plano em `docs/superpowers/plans/2026-11-15-biscate-web-responsive.md`
 **Contexto:** o Biscate foi implementado mobile-first (herdado do protótipo
 telemóvel). O utilizador pediu que a versão seja **web-first**, com hover,
 animações nos botões, motion e responsividade — em tudo (landing, login e
@@ -110,7 +110,7 @@ duplicada).
 
 ### Motion
 
-- `App.tsx`: `<Outlet>` envolto em `AnimatePresence mode="wait"` com
+- `AppShell.tsx` (o `<Outlet>` vive no AppShell): envolto em `AnimatePresence mode="wait"` com
   `MotionPage` (fade + `y: 8`, 250ms, saída 150ms). Respeitar
   `MotionConfig reducedMotion="user"` (já activo em `main.tsx`).
 - Stagger de entrada (0.06-0.09s) nas grelhas: Home, Pesquisa, Pedidos,
@@ -134,7 +134,7 @@ duplicada).
 
 ## Ficheiros a tocar
 
-`tokens.css`, novo `system.css`, `main.tsx`, `App.tsx`, `AppShell.tsx/.css`,
+`tokens.css`, novo `system.css`, `main.tsx`, `AppShell.tsx/.css`,
 `TabBar.tsx`, novo `components/navItems.ts` (+ testes), CSS de
 `Home, Search, Profile, ChatList, ChatRoom, Requests, NewRequest, Plans,
 Payment, Dashboard, Me, Notifications, EditProfile, Login`,
