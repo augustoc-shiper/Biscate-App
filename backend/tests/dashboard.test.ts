@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { beforeAll, expect, it } from 'vitest';
+import { afterAll, beforeAll, expect, it } from 'vitest';
 import { createApp } from '../src/app.js';
 import { pool } from '../src/db/client.js';
 import { seed } from '../src/db/seed.js';
@@ -48,6 +48,14 @@ beforeAll(async () => {
       when: 'week',
     });
   requestId = req.body.data.id;
+});
+
+afterAll(async () => {
+  // não contaminar professionals.test (contagem de planos activos)
+  await pool.query(
+    'update professional_profiles set plan_expires_at = null where user_id = $1',
+    [proId],
+  );
 });
 
 it('dashboard 200 devolve visitas, plan e pendingOffers vazio', async () => {
