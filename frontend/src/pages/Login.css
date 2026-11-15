@@ -1,0 +1,130 @@
+.login-page {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  background: var(--fl);
+}
+
+.login-hero {
+  background: var(--red);
+  color: #fff;
+  padding: 48px 24px 40px;
+  text-align: center;
+}
+
+.login-logo {
+  font-size: 40px;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.login-logo span {
+  color: var(--gold);
+}
+
+.login-tagline {
+  margin: 8px 0 0;
+  opacity: 0.9;
+}
+
+.login-card {
+  background: #fff;
+  margin: -24px 16px 24px;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.login-card [role='tablist'] {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.login-card .tab {
+  flex: 1;
+  border: 1px solid var(--ln);
+  background: #fff;
+  color: var(--mu);
+  padding: 10px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.login-card .tab.active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+
+.login-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.login-card label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  color: var(--mu);
+}
+
+.login-card input:not([type='radio']) {
+  border: 1px solid var(--ln);
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 16px;
+  font-family: inherit;
+}
+
+.login-card input:focus {
+  outline: 2px solid var(--gold);
+  border-color: var(--gold);
+}
+
+.role-choice {
+  border: none;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 0;
+}
+
+.role-choice legend {
+  font-size: 14px;
+  color: var(--mu);
+  padding: 0;
+  margin-bottom: 4px;
+}
+
+.role-choice label {
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink);
+}
+
+.form-error {
+  color: var(--red);
+  font-size: 14px;
+  margin: 0;
+}
+
+.submit {
+  background: var(--red);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 13px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.submit:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
