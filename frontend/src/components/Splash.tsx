@@ -4,7 +4,10 @@ import './Splash.css';
 
 export default function Splash({ onDone }: { onDone: () => void }) {
   const doneRef = useRef(onDone);
-  doneRef.current = onDone;
+
+  useEffect(() => {
+    doneRef.current = onDone;
+  }, [onDone]);
 
   useEffect(() => {
     const reduced =

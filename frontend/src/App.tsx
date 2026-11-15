@@ -6,7 +6,10 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Splash from './components/Splash';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
+import Home from './pages/app/Home';
 import Placeholder from './pages/app/Placeholder';
+import Profile from './pages/app/Profile';
+import Search from './pages/app/Search';
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
@@ -21,12 +24,9 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/app" element={<AppShell />}>
-            <Route index element={<Placeholder title="Início" />} />
-            <Route path="search" element={<Placeholder title="Pesquisa" />} />
-            <Route
-              path="professional/:id"
-              element={<Placeholder title="Perfil do profissional" />}
-            />
+            <Route index element={<Home />} />
+            <Route path="search" element={<Search />} />
+            <Route path="professional/:id" element={<Profile />} />
             <Route path="chat" element={<Placeholder title="Mensagens" />} />
             <Route
               path="chat/:id"

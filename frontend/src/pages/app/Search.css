@@ -1,0 +1,72 @@
+.search-page h1 {
+  margin: 0 0 12px;
+}
+
+.search-input {
+  width: 100%;
+  border: 1px solid var(--ln);
+  border-radius: 12px;
+  padding: 13px 14px;
+  font-size: 16px;
+  font-family: inherit;
+  background: #fff;
+}
+
+.search-input:focus {
+  outline: 2px solid var(--gold);
+  border-color: var(--gold);
+}
+
+.search-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.chip {
+  border: 1px solid var(--ln);
+  background: #fff;
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.chip.active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+  font-weight: 600;
+}
+
+.search-sort {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--mu);
+  font-size: 14px;
+  margin-bottom: 14px;
+}
+
+.search-sort select {
+  border: 1px solid var(--ln);
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-family: inherit;
+  background: #fff;
+}
+
+.search-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.search-loading,
+.search-empty {
+  color: var(--mu);
+  text-align: center;
+  padding: 24px 0;
+}
