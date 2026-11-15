@@ -1,0 +1,66 @@
+.new-request {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.new-request h1 {
+  margin: 0;
+}
+
+.chip-field {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.chip-field legend {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--mut);
+  margin-bottom: 8px;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  background: #fff;
+  border: 1px solid var(--ln);
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.chip.on {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+  font-weight: 700;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field span {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--mut);
+}
+
+.field textarea,
+.field select {
+  border: 1px solid var(--ln);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 15px;
+  font-family: inherit;
+  resize: vertical;
+}

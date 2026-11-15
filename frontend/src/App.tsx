@@ -9,7 +9,11 @@ import Login from './pages/Login';
 import Home from './pages/app/Home';
 import ChatList from './pages/app/ChatList';
 import ChatRoom from './pages/app/ChatRoom';
+import NewRequest from './pages/app/NewRequest';
+import Payment from './pages/app/Payment';
+import Plans from './pages/app/Plans';
 import Placeholder from './pages/app/Placeholder';
+import Requests from './pages/app/Requests';
 import Profile from './pages/app/Profile';
 import Search from './pages/app/Search';
 
@@ -31,11 +35,10 @@ export default function App() {
             <Route path="professional/:id" element={<Profile />} />
             <Route path="chat" element={<ChatList />} />
             <Route path="chat/:id" element={<ChatRoom />} />
-            <Route
-              path="requests"
-              element={<Placeholder title="Pedidos" />}
-            />
-            <Route path="plans" element={<Placeholder title="Planos" />} />
+            <Route path="requests" element={<Requests />} />
+            <Route path="requests/nova" element={<NewRequest />} />
+            <Route path="plans" element={<Plans />} />
+            <Route path="plans/pagamento" element={<Payment />} />
             <Route
               path="dashboard"
               element={<Placeholder title="Painel" />}
