@@ -1,15 +1,17 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 import { listBairros, listCategories } from '../../api/professionals.api';
-import { createRequest, listRequests } from '../../api/requests.api';
+import { acceptOffer, declineOffer, createRequest, listRequests } from '../../api/requests.api';
 import NewRequest from './NewRequest';
 import Requests from './Requests';
 
 vi.mock('../../api/requests.api', () => ({
   listRequests: vi.fn(),
   createRequest: vi.fn(),
+  acceptOffer: vi.fn(),
+  declineOffer: vi.fn(),
 }));
 
 vi.mock('../../api/professionals.api', () => ({
@@ -23,6 +25,8 @@ vi.mock('../../api/professionals.api', () => ({
 
 const mockedListRequests = listRequests as Mock;
 const mockedCreateRequest = createRequest as Mock;
+const mockedAcceptOffer = acceptOffer as Mock;
+const mockedDeclineOffer = declineOffer as Mock;
 const mockedListCategories = listCategories as Mock;
 const mockedListBairros = listBairros as Mock;
 
@@ -118,6 +122,37 @@ describe('Requests', () => {
       description: 'Preciso de desentupir a pia da cozinha.',
       bairroId: 1,
       when: 'today',
+    });
+  });
+
+  it('aceitar proposta chama a api e recarrega a lista', async () => {
+    mockedAcceptOffer.mockResolvedValue({ id: 'off-1', status: 'accepted' });
+
+    const user = userEvent.setup();
+    renderRequests();
+
+    await user.click(
+      await screen.findByRole('button', { name: /aceitar proposta/i }),
+    );
+
+    await waitFor(() => {
+      expect(mockedAcceptOffer).toHaveBeenCalledWith('off-1');
+    });
+    expect(mockedListRequests).toHaveBeenCalledTimes(2);
+  });
+
+  it('recusar proposta chama a api', async () => {
+    mockedDeclineOffer.mockResolvedValue({ id: 'off-1', status: 'declined' });
+
+    const user = userEvent.setup();
+    renderRequests();
+
+    await user.click(
+      await screen.findByRole('button', { name: /recusar proposta/i }),
+    );
+
+    await waitFor(() => {
+      expect(mockedDeclineOffer).toHaveBeenCalledWith('off-1');
     });
   });
 });

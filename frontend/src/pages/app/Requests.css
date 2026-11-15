@@ -108,3 +108,41 @@
   color: var(--mut);
   font-size: 13px;
 }
+
+.offer-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.offer-actions button {
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.offer-actions button[aria-label='Aceitar proposta'] {
+  background: var(--red);
+  border: 1px solid var(--red);
+  color: #fff;
+}
+
+.offer-actions button[aria-label='Recusar proposta'] {
+  background: #fff;
+  border: 1px solid var(--ln);
+  color: var(--ink);
+}
+
+.offer-state {
+  grid-column: 1 / -1;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--red);
+}
+
+.offer-state.muted {
+  color: var(--mut);
+}

@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import type { ServiceRequest } from '../../api/requests.api';
-import { listRequests } from '../../api/requests.api';
+import { acceptOffer, declineOffer, listRequests } from '../../api/requests.api';
 import './Requests.css';
 
 const STATUS_LABEL: Record<ServiceRequest['status'], string> = {
@@ -20,6 +20,7 @@ export default function Requests() {
   const navigate = useNavigate();
   const [requests, setRequests] = useState<ServiceRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [version, setVersion] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -34,7 +35,20 @@ export default function Requests() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [version]);
+
+  async function respond(
+    offerId: string,
+    action: 'accept' | 'decline',
+  ): Promise<void> {
+    try {
+      if (action === 'accept') await acceptOffer(offerId);
+      else await declineOffer(offerId);
+      setVersion((value) => value + 1);
+    } catch {
+      // erro mantém a lista como está; tentar de novo é inofensivo
+    }
+  }
 
   return (
     <div className="requests-page">
@@ -76,6 +90,32 @@ export default function Requests() {
                       </strong>
                       <b>{offer.price} Kz</b>
                       <p>{offer.message}</p>
+                      {offer.status === 'sent' && (
+                        <div className="offer-actions">
+                          <button
+                            type="button"
+                            aria-label="Aceitar proposta"
+                            onClick={() => void respond(offer.id, 'accept')}
+                          >
+                            Aceitar proposta
+                          </button>
+                          <button
+                            type="button"
+                            aria-label="Recusar proposta"
+                            onClick={() => void respond(offer.id, 'decline')}
+                          >
+                            Recusar proposta
+                          </button>
+                        </div>
+                      )}
+                      {offer.status === 'accepted' && (
+                        <small className="offer-state">Proposta aceite</small>
+                      )}
+                      {offer.status === 'declined' && (
+                        <small className="offer-state muted">
+                          Proposta recusada
+                        </small>
+                      )}
                     </li>
                   ))}
                 </ul>

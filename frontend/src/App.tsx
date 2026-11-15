@@ -9,10 +9,13 @@ import Login from './pages/Login';
 import Home from './pages/app/Home';
 import ChatList from './pages/app/ChatList';
 import ChatRoom from './pages/app/ChatRoom';
+import Dashboard from './pages/app/Dashboard';
+import Me from './pages/app/Me';
 import NewRequest from './pages/app/NewRequest';
+import EditProfile from './pages/app/EditProfile';
+import Notifications from './pages/app/Notifications';
 import Payment from './pages/app/Payment';
 import Plans from './pages/app/Plans';
-import Placeholder from './pages/app/Placeholder';
 import Requests from './pages/app/Requests';
 import Profile from './pages/app/Profile';
 import Search from './pages/app/Search';
@@ -39,11 +42,10 @@ export default function App() {
             <Route path="requests/nova" element={<NewRequest />} />
             <Route path="plans" element={<Plans />} />
             <Route path="plans/pagamento" element={<Payment />} />
-            <Route
-              path="dashboard"
-              element={<Placeholder title="Painel" />}
-            />
-            <Route path="me" element={<Placeholder title="Perfil" />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="me" element={<Me />} />
+            <Route path="me/editar" element={<EditProfile />} />
+            <Route path="notificacoes" element={<Notifications />} />
           </Route>
         </Route>
       </Routes>

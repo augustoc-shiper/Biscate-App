@@ -64,3 +64,54 @@
   font-family: inherit;
   resize: vertical;
 }
+
+.edit-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.edit-photos {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--mut);
+}
+
+.edit-photos input[type='file'] {
+  font-size: 13px;
+}
+
+.edit-photo-strip {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.edit-photo-strip img {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--ln);
+}
+
+.edit-success {
+  margin: 0;
+  background: #e8f6ec;
+  color: #1c7a3d;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 14px;
+}
+
+.field input[type='text'] {
+  border: 1px solid var(--ln);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 15px;
+  font-family: inherit;
+}

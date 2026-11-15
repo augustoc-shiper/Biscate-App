@@ -36,3 +36,13 @@ export async function createRequest(input: {
   const res = await apiClient.post('/requests', input);
   return (res.data as { data: ServiceRequest }).data;
 }
+
+export async function acceptOffer(offerId: string): Promise<Offer> {
+  const res = await apiClient.post(`/offers/${offerId}/accept`);
+  return (res.data as { data: Offer }).data;
+}
+
+export async function declineOffer(offerId: string): Promise<Offer> {
+  const res = await apiClient.post(`/offers/${offerId}/decline`);
+  return (res.data as { data: Offer }).data;
+}
