@@ -4,7 +4,7 @@ import { AppError } from './AppError.js';
 
 export type JwtPayload = {
   id: string;
-  role: 'client' | 'professional';
+  role: 'client' | 'professional' | 'admin';
 };
 
 export function signToken(payload: JwtPayload): string {

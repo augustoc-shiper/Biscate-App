@@ -4,7 +4,7 @@ export type User = {
   id: string;
   name: string;
   email: string;
-  role: 'client' | 'professional';
+  role: 'client' | 'professional' | 'admin';
   phone?: string | null;
   avatarUrl?: string | null;
   verified?: boolean;

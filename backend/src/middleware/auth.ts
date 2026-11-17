@@ -20,15 +20,20 @@ export function requireAuth(
   }
 }
 
-export function requireRole(role: 'client' | 'professional') {
+const ROLE_LABEL: Record<'client' | 'professional' | 'admin', string> = {
+  client: 'cliente',
+  professional: 'profissional',
+  admin: 'administrador',
+};
+
+export function requireRole(role: keyof typeof ROLE_LABEL) {
   return (req: Request, _res: Response, next: NextFunction): void => {
     if (!req.user || req.user.role !== role) {
       next(
         new AppError(
           403,
           'FORBIDDEN',
-          'Acesso reservado a contas de ' +
-            (role === 'client' ? 'cliente' : 'profissional'),
+          'Acesso reservado a contas de ' + ROLE_LABEL[role],
         ),
       );
       return;

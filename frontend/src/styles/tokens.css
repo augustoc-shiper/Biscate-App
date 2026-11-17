@@ -4,6 +4,9 @@
   --ink: #111111;
   --fl: #f3f3f3;
   --mu: #5e5e5e;
+  /* Aliases usados por páginas existentes; mantêm a identidade visual. */
+  --mut: var(--mu);
+  --wash: #f3f3f3;
   --ln: #e8e8e8;
   --font: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
 }

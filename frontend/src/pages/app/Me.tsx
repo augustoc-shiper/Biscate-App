@@ -51,7 +51,11 @@ export default function Me() {
           <h1>{user.name}</h1>
           <p>{user.email}</p>
           <span className="me-role">
-            {user.role === 'professional' ? 'Profissional' : 'Cliente'}
+            {user.role === 'professional'
+              ? 'Profissional'
+              : user.role === 'admin'
+                ? 'Administrador'
+                : 'Cliente'}
           </span>
         </div>
       </div>
@@ -68,6 +72,11 @@ export default function Me() {
         {user.role === 'professional' && (
           <Link to="/app/me/editar" className="me-row">
             Editar perfil
+          </Link>
+        )}
+        {user.role === 'admin' && (
+          <Link to="/admin" className="me-row">
+            Administração de pagamentos
           </Link>
         )}
         <details className="me-row me-help">

@@ -1,12 +1,45 @@
 .plans-page h1,
 .payment-page h1 {
   margin: 0 0 4px;
+  font-size: clamp(22px, 5vw, 28px);
+}
+
+.plans-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
 .plans-sub {
   margin: 0 0 20px;
   color: var(--mut);
   font-size: 14px;
+  line-height: 1.5;
+}
+
+.plans-refresh,
+.plans-cancel,
+.plans-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  color: var(--ink);
+  border: 1px solid var(--ln);
+  border-radius: 999px;
+  padding: 9px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.plans-refresh:disabled,
+.plans-cancel:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 
 .plans-empty {
@@ -15,9 +48,100 @@
   padding: 32px 16px;
 }
 
+/* Estado actual da subscrição */
+.sub-current {
+  background: #fff;
+  border: 1px solid var(--ln);
+  border-left: 4px solid var(--red);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.sub-current-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sub-current-top h2 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.sub-current-name {
+  margin: 10px 0 4px;
+  font-weight: 700;
+}
+
+.sub-current-desc {
+  margin: 0 0 12px;
+  color: var(--mut);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.sub-facts,
+.admin-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.sub-facts div,
+.admin-facts div {
+  background: var(--fl);
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.sub-facts dt,
+.admin-facts dt {
+  color: var(--mut);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.sub-facts dd,
+.admin-facts dd {
+  margin: 4px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.plans-blocked {
+  background: #fff2d6;
+  border: 1px solid #f0d79a;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 18px;
+}
+
+.plans-blocked strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.plans-blocked p {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Selecção de planos */
+.plans-section-title {
+  font-size: 16px;
+  margin: 22px 0 12px;
+}
+
 .plan-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 12px;
 }
 
@@ -32,6 +156,13 @@
   align-items: center;
   gap: 4px;
   cursor: pointer;
+  color: var(--ink);
+  text-align: center;
+}
+
+.plan-card:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 
 .plan-card.on {
@@ -56,7 +187,8 @@
 
 .plan-price {
   color: var(--red);
-  font-size: 22px;
+  font-size: 20px;
+  overflow-wrap: anywhere;
 }
 
 .plan-days {
@@ -85,6 +217,35 @@
   cursor: default;
 }
 
+.plans-confirm {
+  background: #fff;
+  border: 1px dashed var(--red);
+  border-radius: 14px;
+  padding: 14px;
+  margin-top: 14px;
+}
+
+.plans-confirm p {
+  margin: 0 0 4px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.plans-confirm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.plans-confirm-actions .plans-continue {
+  flex: 1 1 220px;
+  margin-top: 10px;
+}
+
+.plans-confirm-actions .plans-cancel {
+  margin-top: 10px;
+}
+
 .plans-error {
   background: var(--red);
   color: #fff;
@@ -94,6 +255,50 @@
   margin-top: 14px;
 }
 
+/* Histórico */
+.sub-history {
+  margin-top: 8px;
+}
+
+.history-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.history-list li {
+  background: #fff;
+  border: 1px solid var(--ln);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.history-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.history-list small {
+  color: var(--mut);
+  font-size: 12px;
+}
+
+.history-list .plans-link {
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 6px 12px;
+}
+
+/* Pagamento e comprovativo */
 .payment-box {
   background: #fff;
   border: 1px solid var(--ln);
@@ -105,6 +310,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
   padding: 14px 0;
   border-bottom: 1px dashed var(--ln);
 }
@@ -121,6 +328,64 @@
 .payment-row b {
   font-size: 18px;
   letter-spacing: 1px;
+  overflow-wrap: anywhere;
+}
+
+.proof-sent {
+  background: #e5f6ec;
+  border-radius: 12px;
+  padding: 14px;
+  margin-top: 14px;
+}
+
+.proof-sent strong {
+  color: #16794a;
+}
+
+.proof-sent p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.proof-upload {
+  background: #fff;
+  border: 1px solid var(--ln);
+  border-radius: 14px;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+.proof-upload h2 {
+  margin: 0 0 10px;
+  font-size: 17px;
+}
+
+.proof-upload label {
+  display: block;
+  font-size: 13px;
+  color: var(--mut);
+  margin-bottom: 6px;
+}
+
+.proof-upload input[type='file'] {
+  width: 100%;
+  max-width: 100%;
+  font-size: 14px;
+}
+
+.payment-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.payment-actions .plans-refresh,
+.payment-actions .plans-link {
+  margin: 0;
 }
 
 .payment-activated {
@@ -154,4 +419,16 @@
 
 .payment-activated .plans-continue {
   max-width: 320px;
+}
+
+@media (min-width: 900px) {
+  .plans-page,
+  .payment-page {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .sub-facts {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }

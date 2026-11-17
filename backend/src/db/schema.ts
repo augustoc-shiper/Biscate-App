@@ -1,6 +1,8 @@
 import { sql } from 'drizzle-orm';
 import {
+  type AnyPgColumn,
   boolean,
+  char,
   check,
   index,
   integer,
@@ -9,13 +11,12 @@ import {
   pgTable,
   primaryKey,
   real,
-
   text,
   timestamp,
   uniqueIndex,
 } from 'drizzle-orm/pg-core';
 
-export const roleEnum = pgEnum('user_role', ['client', 'professional']);
+export const roleEnum = pgEnum('user_role', ['client', 'professional', 'admin']);
 export const requestStatusEnum = pgEnum('request_status', [
   'open',
   'in_conversation',
@@ -35,6 +36,18 @@ export const messageKindEnum = pgEnum('message_kind', [
 export const paymentStatusEnum = pgEnum('payment_status', [
   'pending',
   'confirmed',
+  'proof_sent',
+  'approved',
+  'rejected',
+]);
+
+export const subscriptionStatusEnum = pgEnum('subscription_status', [
+  'pending_payment',
+  'pending_activation',
+  'active',
+  'expired',
+  'rejected',
+  'pending_review',
 ]);
 
 export const users = pgTable('users', {
@@ -49,6 +62,11 @@ export const users = pgTable('users', {
   bio: text('bio'),
   avatarUrl: text('avatar_url'),
   verified: boolean('verified').notNull().default(false),
+  // Moderação: um cliente bloqueado/suspenso NÃO activa subscrição por mensagem.
+  // Campos aditivos; gestão pela API ainda indisponível na FASE 4.
+  // Ver docs/fase4-subscriptions.md.
+  blocked: boolean('blocked').notNull().default(false),
+  suspended: boolean('suspended').notNull().default(false),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
@@ -76,6 +94,9 @@ export const professionalProfiles = pgTable(
     responseTime: text('response_time'),
     availableToday: boolean('available_today').notNull().default(false),
     planExpiresAt: timestamp('plan_expires_at', { withTimezone: true }),
+    // Sinal de visibilidade/contactabilidade, separado da activacao real.
+    // So activePlan()/assertActivePlan() devem considera-lo.
+    discoverableUntil: timestamp('discoverable_until', { withTimezone: true }),
     ratingAvg: real('rating_avg').notNull().default(0),
     ratingCount: integer('rating_count').notNull().default(0),
     visitsCount: integer('visits_count').notNull().default(0),
@@ -222,23 +243,96 @@ export const plans = pgTable('plans', {
   highlight: boolean('highlight').notNull().default(false),
 });
 
-export const payments = pgTable('payments', {
-  id: text('id')
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  professionalId: text('professional_id')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-  planId: integer('plan_id')
-    .notNull()
-    .references(() => plans.id),
-  entity: text('entity').notNull(),
-  reference: text('reference').notNull(),
-  amountKz: integer('amount_kz').notNull(),
-  status: paymentStatusEnum('status').notNull().default('pending'),
-  confirmedAt: timestamp('confirmed_at', { withTimezone: true }),
-  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
-});
+export const payments = pgTable(
+  'payments',
+  {
+    id: text('id')
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    professionalId: text('professional_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    planId: integer('plan_id')
+      .notNull()
+      .references(() => plans.id),
+    entity: text('entity').notNull(),
+    reference: text('reference').notNull(),
+    amountKz: integer('amount_kz').notNull(),
+    status: paymentStatusEnum('status').notNull().default('pending'),
+    confirmedAt: timestamp('confirmed_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+
+    // Aditivas: extensibilidade para gateways futuros (sem migração depois).
+    provider: text('provider').notNull().default('manual'),
+    method: text('method').notNull().default('proof'),
+    currency: char('currency', { length: 3 }).notNull().default('AOA'),
+    externalReference: text('external_reference'),
+    approvedBy: text('approved_by').references(() => users.id, {
+      onDelete: 'set null',
+    }),
+
+    // Comprovativo (apenas no ramo manual/proof).
+    proofUrl: text('proof_url'),
+    proofSentAt: timestamp('proof_sent_at', { withTimezone: true }),
+
+    // Aprovação / idempotência do pipeline único de confirmação.
+    approvedAt: timestamp('approved_at', { withTimezone: true }),
+    rejectedAt: timestamp('rejected_at', { withTimezone: true }),
+    appliedAt: timestamp('applied_at', { withTimezone: true }),
+    subscriptionId: text('subscription_id').references(
+      (): AnyPgColumn => subscriptions.id,
+      { onDelete: 'set null' },
+    ),
+  },
+  (t) => [
+    uniqueIndex('payments_external_reference_key')
+      .on(t.externalReference)
+      .where(sql`${t.externalReference} is not null`),
+  ],
+);
+
+export const subscriptions = pgTable(
+  'subscriptions',
+  {
+    id: text('id')
+      .primaryKey()
+      .default(sql`gen_random_uuid()`),
+    professionalId: text('professional_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    planId: integer('plan_id').references(() => plans.id, {
+      onDelete: 'set null',
+    }),
+    paymentId: text('payment_id').references(() => payments.id, {
+      onDelete: 'set null',
+    }),
+    status: subscriptionStatusEnum('status')
+      .notNull()
+      .default('pending_payment'),
+    approvedAt: timestamp('approved_at', { withTimezone: true }),
+    activationDeadline: timestamp('activation_deadline', { withTimezone: true }),
+    activatedAt: timestamp('activated_at', { withTimezone: true }),
+    expiresAt: timestamp('expires_at', { withTimezone: true }),
+    needsReview: boolean('needs_review').notNull().default(false),
+    reviewReason: text('review_reason'),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    uniqueIndex('subscriptions_payment_id_key').on(t.paymentId),
+    index('subscriptions_professional_idx').on(t.professionalId, t.status),
+    index('subscriptions_pending_activation_idx')
+      .on(t.activationDeadline)
+      .where(sql`${t.status} = 'pending_activation'`),
+    index('subscriptions_active_expiry_idx')
+      .on(t.expiresAt)
+      .where(sql`${t.status} = 'active'`),
+  ],
+);
 
 export const notifications = pgTable(
   'notifications',
@@ -261,3 +355,6 @@ export type User = typeof users.$inferSelect;
 export type ProfessionalProfile = typeof professionalProfiles.$inferSelect;
 export type Conversation = typeof conversations.$inferSelect;
 export type Message = typeof messages.$inferSelect;
+export type Plan = typeof plans.$inferSelect;
+export type Payment = typeof payments.$inferSelect;
+export type Subscription = typeof subscriptions.$inferSelect;

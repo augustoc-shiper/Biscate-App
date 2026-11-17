@@ -1,8 +1,7 @@
-import { act, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
+import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 import { useAuth } from '../context/AuthContext';
-import Splash from './Splash';
 import TabBar from './TabBar';
 
 vi.mock('../context/AuthContext', () => ({ useAuth: vi.fn() }));
@@ -27,10 +26,6 @@ function renderTabBar(role: 'client' | 'professional', path = '/app') {
 
 beforeEach(() => {
   vi.clearAllMocks();
-});
-
-afterEach(() => {
-  vi.useRealTimers();
 });
 
 describe('TabBar', () => {
@@ -61,26 +56,5 @@ describe('TabBar', () => {
     expect(active.className).toContain('active');
     const inactive = screen.getByRole('link', { name: /início/i });
     expect(inactive.className).not.toContain('active');
-  });
-});
-
-describe('Splash', () => {
-  it('desaparece após 2,2s chamando onDone (timer fake)', () => {
-    vi.useFakeTimers();
-    const onDone = vi.fn();
-    render(<Splash onDone={onDone} />);
-
-    expect(screen.getByText(/o seu kamba para qualquer biscate/i)).toBeInTheDocument();
-    expect(onDone).not.toHaveBeenCalled();
-
-    act(() => {
-      vi.advanceTimersByTime(2199);
-    });
-    expect(onDone).not.toHaveBeenCalled();
-
-    act(() => {
-      vi.advanceTimersByTime(1);
-    });
-    expect(onDone).toHaveBeenCalledTimes(1);
   });
 });

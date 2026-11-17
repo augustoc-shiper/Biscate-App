@@ -21,7 +21,7 @@ export default async function globalSetup(): Promise<void> {
       `truncate table
          users, categories, bairro, professional_profiles, work_photos,
          favorites, requests, offers, conversations, messages, reviews,
-         plans, payments, notifications
+         plans, payments, subscriptions, notifications
        restart identity cascade`,
     );
   } finally {

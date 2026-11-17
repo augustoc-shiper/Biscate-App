@@ -59,11 +59,17 @@ export async function listRequests(clientId: string) {
   return result;
 }
 
-async function assertActivePlan(professionalId: string): Promise<void> {
+async function assertActivePlan(
+  professionalId: string,
+  now: Date = new Date(),
+): Promise<void> {
   const profile = await db.query.professionalProfiles.findFirst({
     where: eq(professionalProfiles.userId, professionalId),
   });
-  if (!profile?.planExpiresAt || profile.planExpiresAt <= new Date()) {
+  const validadeReal = profile?.planExpiresAt && profile.planExpiresAt > now;
+  const janelaDescoberta =
+    profile?.discoverableUntil && profile.discoverableUntil > now;
+  if (!validadeReal && !janelaDescoberta) {
     throw new AppError(
       403,
       'NO_ACTIVE_PLAN',

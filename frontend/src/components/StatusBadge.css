@@ -1,0 +1,47 @@
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 5px 11px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  background: #ececec;
+  color: #3d3d3d;
+}
+
+.status-badge::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.status-active,
+.status-approved,
+.status-confirmed {
+  background: #e5f6ec;
+  color: #16794a;
+}
+
+.status-pending_payment,
+.status-pending,
+.status-proof_sent {
+  background: #fff2d6;
+  color: #96620b;
+}
+
+.status-pending_activation,
+.status-pending_review {
+  background: #e6f0ff;
+  color: #1b5bb0;
+}
+
+.status-expired,
+.status-rejected {
+  background: #fde8ec;
+  color: #a3122c;
+}

@@ -6,14 +6,18 @@ import {
   users,
 } from '../db/schema.js';
 import type { SendMessageInput } from '../dto/conversations.dto.js';
+import { systemClock } from '../lib/clock.js';
 import { AppError } from '../lib/AppError.js';
 import { ensureConversation } from './conversations.helpers.js';
+import { activateByMessage, type Tx } from './subscriptions.service.js';
 
 export async function assertParticipant(
   conversationId: string,
   userId: string,
+  tx?: Tx,
 ): Promise<(typeof conversations.$inferSelect)> {
-  const conversation = await db.query.conversations.findFirst({
+  const executor = tx ?? db;
+  const conversation = await executor.query.conversations.findFirst({
     where: eq(conversations.id, conversationId),
   });
   if (!conversation) {
@@ -150,30 +154,55 @@ export async function listMessages(
   return { data: rows, meta: { total: total?.n ?? 0 } };
 }
 
+/**
+ * A mensagem e a eventual activação partilham a mesma transacção: se a lock de
+ * activação falhar (LOCK_BUSY), nada fica gravado e uma nova tentativa insere
+ * exactamente uma mensagem. A assinatura pública é mantida para REST e socket.
+ */
 export async function sendMessage(
   conversationId: string,
   senderId: string,
   input: SendMessageInput,
+  now: Date = systemClock(),
 ) {
-  await assertParticipant(conversationId, senderId);
+  return db.transaction(async (tx) => {
+    const conversation = await assertParticipant(conversationId, senderId, tx);
 
-  const [created] = await db
-    .insert(messages)
-    .values({
-      conversationId,
-      senderId,
-      body: input.body,
-      kind: input.kind,
-      payload: input.payload ?? null,
-    })
-    .returning();
+    const [created] = await tx
+      .insert(messages)
+      .values({
+        conversationId,
+        senderId,
+        body: input.body,
+        kind: input.kind,
+        payload: input.payload ?? null,
+        createdAt: now,
+      })
+      .returning();
 
-  await db
-    .update(conversations)
-    .set({ lastMessageAt: created.createdAt ?? new Date() })
-    .where(eq(conversations.id, conversationId));
+    await tx
+      .update(conversations)
+      .set({ lastMessageAt: now })
+      .where(eq(conversations.id, conversationId));
 
-  return created;
+    // Só o cliente pode activar, com mensagem de texto posterior à aprovação.
+    if (conversation.clientId === senderId) {
+      await activateByMessage(
+        {
+          conversationId,
+          clientId: senderId,
+          professionalId: conversation.professionalId,
+          kind: input.kind,
+          body: input.body,
+          createdAt: now,
+        },
+        now,
+        tx,
+      );
+    }
+
+    return created;
+  });
 }
 
 // re-exported for Task 8 (requests accept) and Task 10 (socket)

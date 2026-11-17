@@ -20,14 +20,14 @@ afterAll(async () => {
   await pool.end();
 });
 
-it('cria as 14 tabelas do spec', async () => {
+it('cria as 15 tabelas do spec', async () => {
   const res = await pool.query(
     `select table_name from information_schema.tables
      where table_schema = 'public' and table_type = 'BASE TABLE'
      order by table_name`,
   );
   const names = res.rows.map((r) => r.table_name);
-  expect(names).toHaveLength(14);
+  expect(names).toHaveLength(15);
   expect(names).toEqual(
     expect.arrayContaining([
       'users',
@@ -43,6 +43,7 @@ it('cria as 14 tabelas do spec', async () => {
       'reviews',
       'plans',
       'payments',
+      'subscriptions',
       'notifications',
     ]),
   );
@@ -68,4 +69,16 @@ it('professional_profiles tem price_min e distance_km', async () => {
   const cols = res.rows.map((r) => r.column_name);
   expect(cols).toContain('price_min');
   expect(cols).toContain('distance_km');
+});
+
+it('payments.subscription_id tem exactamente uma foreign key', async () => {
+  const res = await pool.query(`
+    select count(*)::int as n
+    from pg_constraint c
+    join pg_attribute a on a.attrelid = c.conrelid and a.attnum = any(c.conkey)
+    where c.conrelid = 'public.payments'::regclass
+      and c.contype = 'f'
+      and a.attname = 'subscription_id'
+  `);
+  expect(res.rows[0].n).toBe(1);
 });

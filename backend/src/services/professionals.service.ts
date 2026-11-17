@@ -20,8 +20,15 @@ import {
 import type { ProfessionalQuery } from '../dto/professionals.dto.js';
 import { AppError } from '../lib/AppError.js';
 
-function activePlan() {
-  return gt(professionalProfiles.planExpiresAt, new Date());
+/**
+ * Profissional visível/contactável se a validade REAL ou a janela de
+ * descoberta (aprovação → primeira mensagem) ainda não terminou.
+ */
+function activePlan(now: Date = new Date()) {
+  return or(
+    gt(professionalProfiles.planExpiresAt, now),
+    gt(professionalProfiles.discoverableUntil, now),
+  )!;
 }
 
 function buildFilters(query: ProfessionalQuery) {

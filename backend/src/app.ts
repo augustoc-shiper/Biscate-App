@@ -14,13 +14,18 @@ import {
   offerRoutes,
   requestRoutes,
 } from './routes/requests.routes.js';
-import { paymentRoutes, planRoutes } from './routes/payments.routes.js';
+import {
+  paymentRoutes,
+  planRoutes,
+  subscriptionRoutes,
+} from './routes/payments.routes.js';
 import {
   dashboardRoutes,
   profileRoutes,
 } from './routes/profile.routes.js';
 import { notificationRoutes } from './routes/notifications.routes.js';
 import { reviewRoutes } from './routes/reviews.routes.js';
+import { adminRoutes } from './routes/admin.routes.js';
 
 export function createApp(): Express {
   const app = express();
@@ -42,9 +47,11 @@ export function createApp(): Express {
   app.use('/api/reviews', reviewRoutes);
   app.use('/api/plans', planRoutes);
   app.use('/api/payments', paymentRoutes);
+  app.use('/api/subscriptions', subscriptionRoutes);
   app.use('/api/dashboard', dashboardRoutes);
   app.use('/api/profile', profileRoutes);
   app.use('/api/notifications', notificationRoutes);
+  app.use('/api/admin', adminRoutes);
   app.use('/api', metaRoutes);
 
   app.use(notFoundHandler);

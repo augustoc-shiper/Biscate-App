@@ -1,27 +1,96 @@
+/* Cores exactas da identidade Biskato (não dependem de tokens globais). */
 .splash {
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: var(--red);
+  box-sizing: border-box;
+  overflow: hidden;
+  padding: 24px;
+  background: var(--splash-bg, #C8102E);
+  color: var(--splash-bis, #FFFFFF);
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  color: #fff;
+  opacity: 1;
+  transition: opacity 400ms ease;
 }
 
-.splash-logo {
-  font-size: 56px;
+.splash--exit {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.splash-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(10px, 2.4vh, 18px);
+  max-width: 100%;
+}
+
+/* "is" e "ato" ocupam o seu espaço mesmo invisíveis: b e k ficam alinhados. */
+.splash-word {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  max-width: 100%;
+  font-size: clamp(40px, 13vw, 88px);
   font-weight: 800;
-  letter-spacing: -2px;
+  letter-spacing: -0.04em;
+  line-height: 1;
 }
 
-.splash-logo span {
-  color: var(--gold);
+.splash-letter {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(8px) scale(0.96);
+  transition:
+    opacity 260ms ease,
+    transform 260ms ease;
+}
+
+.splash-letter--bis {
+  color: var(--splash-bis, #FFFFFF);
+}
+
+.splash-letter--kato {
+  color: var(--splash-kato, #F2B705);
+}
+
+.splash--initial .splash-letter[data-part='b'],
+.splash--initial .splash-letter[data-part='k'],
+.splash--brand .splash-letter,
+.splash--slogan .splash-letter,
+.splash--exit .splash-letter {
+  opacity: 1;
+  transform: none;
 }
 
 .splash-tagline {
-  margin-top: 10px;
-  font-size: 17px;
-  opacity: 0.92;
+  margin: 0;
+  max-width: 100%;
+  color: var(--splash-bis, #FFFFFF);
+  font-size: clamp(14px, 4vw, 20px);
+  font-weight: 500;
+  line-height: 1.35;
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 320ms ease,
+    transform 320ms ease;
+}
+
+.splash--slogan .splash-tagline,
+.splash--exit .splash-tagline {
+  opacity: 0.95;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash,
+  .splash-letter,
+  .splash-tagline {
+    transition: none !important;
+  }
 }

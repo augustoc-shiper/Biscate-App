@@ -1,8 +1,14 @@
 import { motion } from 'motion/react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type ChangeEvent } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import type { Payment as PaymentData } from '../../api/payments.api';
-import { confirmPayment, listPayments } from '../../api/payments.api';
+import {
+  listPayments,
+  PROOF_ACCEPT,
+  sendProof,
+  validateProofFile,
+} from '../../api/payments.api';
+import { PaymentStatusBadge } from '../../components/StatusBadge';
 import './Plans.css';
 
 function apiMessage(err: unknown): string {
@@ -17,22 +23,25 @@ export default function Payment() {
   const paymentId = searchParams.get('paymentId');
 
   const [payment, setPayment] = useState<PaymentData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(Boolean(paymentId));
   const [error, setError] = useState<string | null>(null);
-  const [activated, setActivated] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
+
+  const load = useCallback(async (): Promise<void> => {
+    if (!paymentId) return;
+    const rows = await listPayments();
+    const found = rows.find((row) => row.id === paymentId) ?? null;
+    setPayment(found);
+    if (!found) setError('Pagamento não encontrado.');
+  }, [paymentId]);
 
   useEffect(() => {
     if (!paymentId) return;
     let cancelled = false;
-    listPayments()
-      .then((rows) => {
-        if (cancelled) return;
-        const found = rows.find((row) => row.id === paymentId) ?? null;
-        setPayment(found);
-        if (!found) setError('Pagamento não encontrado.');
-        if (found?.status === 'confirmed') setActivated(true);
-      })
+    load()
       .catch((err) => {
         if (!cancelled) setError(apiMessage(err));
       })
@@ -42,15 +51,39 @@ export default function Payment() {
     return () => {
       cancelled = true;
     };
-  }, [paymentId]);
+  }, [paymentId, load]);
 
-  async function onPaid(): Promise<void> {
-    if (!payment) return;
-    setSaving(true);
+  function onFileChange(event: ChangeEvent<HTMLInputElement>): void {
+    const picked = event.target.files?.[0] ?? null;
+    setFile(picked);
+    setFileError(picked ? validateProofFile(picked) : 'Selecciona um comprovativo.');
+    if (picked) setSent(false);
+  }
+
+  async function refreshStatus(): Promise<void> {
     setError(null);
     try {
-      await confirmPayment(payment.id);
-      setActivated(true);
+      await load();
+    } catch (err) {
+      setError(apiMessage(err));
+    }
+  }
+
+  async function onSubmit(): Promise<void> {
+    if (!payment || !file) return;
+    const invalid = validateProofFile(file);
+    if (invalid) {
+      setFileError(invalid);
+      return;
+    }
+    setSaving(true);
+    setError(null);
+    setFileError(null);
+    try {
+      const updated = await sendProof(payment.id, file);
+      setPayment(updated);
+      setSent(true);
+      setFile(null);
     } catch (err) {
       setError(apiMessage(err));
     } finally {
@@ -68,39 +101,16 @@ export default function Payment() {
 
   if (loading) return <p className="plans-empty">A carregar…</p>;
 
-  if (activated) {
-    return (
-      <motion.div
-        className="payment-activated"
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.35 }}
-      >
-        <motion.span
-          className="check"
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: 'spring', stiffness: 260, damping: 14 }}
-          aria-hidden
-        >
-          ✓
-        </motion.span>
-        <h1>Plano activado</h1>
-        <p>Ya! O teu plano está activo. Podes começar a receber pedidos.</p>
-        <Link to="/app" className="plans-continue">
-          Continuar
-        </Link>
-      </motion.div>
-    );
-  }
-
-  if (error || !payment) {
+  if (!payment) {
     return (
       <p className="plans-empty" role="alert">
         {error ?? 'Pagamento não encontrado.'}
       </p>
     );
   }
+
+  const awaitingReview =
+    payment.status === 'proof_sent' || payment.status === 'confirmed';
 
   return (
     <div className="payment-page">
@@ -119,10 +129,30 @@ export default function Payment() {
           <b data-testid="referencia">{payment.reference}</b>
         </div>
         <div className="payment-row">
+          <span>Valor</span>
+          <b>{payment.amountKz.toLocaleString('pt-AO')} Kz</b>
+        </div>
+        <div className="payment-row">
           <span>Estado</span>
-          <b>{payment.status === 'confirmed' ? 'Confirmado' : 'Pendente'}</b>
+          <PaymentStatusBadge status={payment.status} />
         </div>
       </div>
+
+      {(sent || awaitingReview) && (
+        <motion.div
+          className="proof-sent"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          role="status"
+        >
+          <strong>Comprovativo enviado</strong>
+          <p>
+            Está a aguardar a análise da administração. Podes acompanhar o estado
+            aqui; a aprovação é feita apenas pela administração.
+          </p>
+        </motion.div>
+      )}
 
       {error && (
         <div role="alert" className="plans-error">
@@ -130,14 +160,44 @@ export default function Payment() {
         </div>
       )}
 
-      <button
-        type="button"
-        className="plans-continue"
-        disabled={saving}
-        onClick={() => void onPaid()}
-      >
-        {saving ? 'A confirmar…' : 'Já paguei'}
-      </button>
+      {payment.status === 'pending' || payment.status === 'proof_sent' ? (
+        <section className="proof-upload" aria-label="Enviar comprovativo">
+          <h2>Enviar comprovativo</h2>
+          <label htmlFor="proof-file">Ficheiro (JPG, JPEG, PNG ou WEBP, até 5 MB)</label>
+          <input
+            id="proof-file"
+            type="file"
+            accept={PROOF_ACCEPT}
+            onChange={onFileChange}
+          />
+          {fileError && (
+            <p className="plans-error" role="alert">
+              {fileError}
+            </p>
+          )}
+          <button
+            type="button"
+            className="plans-continue"
+            disabled={!file || Boolean(fileError) || saving}
+            onClick={() => void onSubmit()}
+          >
+            {saving ? 'A enviar…' : 'Enviar comprovativo'}
+          </button>
+        </section>
+      ) : (
+        <p className="plans-sub">
+          Este pagamento já não aceita comprovativos. Consulta o estado acima.
+        </p>
+      )}
+
+      <div className="payment-actions">
+        <button type="button" className="plans-refresh" onClick={() => void refreshStatus()}>
+          Actualizar estado
+        </button>
+        <Link to="/app/plans" className="plans-link">
+          Voltar à subscrição
+        </Link>
+      </div>
     </div>
   );
 }

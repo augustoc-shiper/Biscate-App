@@ -1,4 +1,6 @@
 import bcrypt from 'bcryptjs';
+import { eq } from 'drizzle-orm';
+import { basename } from 'node:path';
 import { db } from './client.js';
 import {
   bairro,
@@ -182,7 +184,18 @@ const CLIENTS = [
 const day = 24 * 60 * 60 * 1000;
 const hoursAgo = (h: number) => new Date(Date.now() - h * 60 * 60 * 1000);
 
+const isProduction = () => process.env.NODE_ENV === 'production';
+
+/**
+ * Dados de demonstracao (password `biscate123`) apenas em dev/test.
+ * Em producao nao sao inseridos; a conta admin vem de `seedAdmin()`.
+ */
 export async function seed(database = db): Promise<void> {
+  if (isProduction()) {
+    console.warn('[seed] Producao: dados de demonstracao nao inseridos.');
+    return;
+  }
+
   const passwordHash = bcrypt.hashSync('biscate123', 10);
 
   await database.insert(categories).values(CATS).onConflictDoNothing();
@@ -422,16 +435,65 @@ export async function seed(database = db): Promise<void> {
     .onConflictDoNothing();
 }
 
-const scriptName = process.argv[1]?.split('/').pop() ?? '';
+/**
+ * Primeira conta admin, criada apenas a partir de variaveis de ambiente.
+ * - sem defaults;
+ * - idempotente (email ja admin => no-op);
+ * - email existente como client/professional => erro, sem promocao;
+ * - producao sem env => falha; dev/test sem env => aviso.
+ */
+export async function seedAdmin(
+  database = db,
+): Promise<{ created: boolean }> {
+  const email = process.env.ADMIN_EMAIL;
+  const password = process.env.ADMIN_PASSWORD;
+  const name = process.env.ADMIN_NAME;
+
+  if (!email || !password || !name) {
+    if (isProduction()) {
+      throw new Error(
+        'ADMIN_EMAIL, ADMIN_PASSWORD e ADMIN_NAME sao obrigatorios em producao',
+      );
+    }
+    console.warn(
+      '[seedAdmin] ADMIN_EMAIL/ADMIN_PASSWORD/ADMIN_NAME nao definidos: admin nao criado.',
+    );
+    return { created: false };
+  }
+
+  const existing = await database.query.users.findFirst({
+    where: eq(users.email, email),
+  });
+  if (existing) {
+    if (existing.role === 'admin') return { created: false };
+    throw new Error(
+      `Email ${email} ja existe como ${existing.role}; nao promover automaticamente.`,
+    );
+  }
+
+  await database.insert(users).values({
+    name,
+    email,
+    passwordHash: bcrypt.hashSync(password, 10),
+    role: 'admin',
+    verified: true,
+  });
+  return { created: true };
+}
+
+// `split('/')` falhava no Windows; basename() e portatil.
+const scriptName = basename(process.argv[1] ?? '');
 const isCli = scriptName === 'seed.ts' || scriptName === 'seed.js';
 if (isCli) {
-  seed()
-    .then(() => {
-      console.log('Seed concluído.');
-      process.exit(0);
-    })
-    .catch((err) => {
-      console.error(err);
-      process.exit(1);
-    });
+  (async () => {
+    await seed();
+    const admin = await seedAdmin();
+    console.log(
+      `Seed concluído.${admin.created ? ' Admin criado.' : ' Admin nao criado (ver avisos acima).'}`,
+    );
+    process.exit(0);
+  })().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
 }
